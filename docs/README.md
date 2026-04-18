@@ -1,6 +1,6 @@
 # Pathfinder
 
-Pathfinder is an operations platform for leads, school applications, dashboards, notifications, archive, personnel, and timesheets.
+Pathfinder is a business operations platform for leads, school applications, dashboards, notifications, archive, personnel, and timesheets.
 
 ## Doc Revision
 
