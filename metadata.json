@@ -1,5 +1,5 @@
 {
   "name": "Pathfinder",
-  "description": "A modern React-based login portal for Pathfinder Philippines, featuring theme switching and Firebase authentication. This application is a complete frontend implementation using React, TypeScript, and Tailwind CSS.",
+  "description": "Portfolio-ready operations platform demonstrating authentication, dashboards, workflow management, admin tooling, and process-focused system design using React, TypeScript, Tailwind CSS, and Firebase.",
   "requestFramePermissions": []
 }
