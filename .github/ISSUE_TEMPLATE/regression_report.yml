@@ -1,0 +1,42 @@
+name: Regression Report
+description: Report behavior that used to work but now fails.
+title: "[Regression] "
+labels:
+  - regression
+  - needs-triage
+body:
+  - type: textarea
+    id: changed
+    attributes:
+      label: What Regressed
+      description: Describe what changed from previous behavior.
+    validations:
+      required: true
+  - type: input
+    id: last_good
+    attributes:
+      label: Last Known Good Commit/Release
+      placeholder: e.g. b719f36
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Affected routes, module flows, API endpoints, or export paths.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verification
+      options:
+        - label: Ran `npm run verify`
+        - label: Ran `npm run test:e2e:smoke`
+        - label: Confirmed issue on latest `main`
+  - type: textarea
+    id: logs
+    attributes:
+      label: Evidence
+      description: Attach logs, traces, screenshots, or failing assertions.
+

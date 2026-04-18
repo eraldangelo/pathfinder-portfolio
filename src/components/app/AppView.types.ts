@@ -1,0 +1,42 @@
+import type { ApplicationInfo } from '../../data/applications';
+import type { PersonnelWithDetails } from '../../data/personnel';
+import type { AssessmentSubmission, Theme, User, View } from '../../types';
+import type { PersistentNotificationItem } from './hooks/useNotifications';
+import type { Lead } from '../leads/leads-page/LeadsPage';
+import type { StudentInfoTab } from '../leads/types/studentInfoTab';
+import type { BranchChangeRequestFormData } from '../../types/branchChangeRequest';
+
+export interface AppViewProps {
+    view: View;
+    user: User;
+    userRole: string;
+    isReady: boolean;
+    theme: Theme;
+    leads: Lead[];
+    assessmentSubmissions: AssessmentSubmission[];
+    genuineSubmissionIds: Set<string>;
+    applications: ApplicationInfo[];
+    allPersonnel: PersonnelWithDetails[];
+    notifications: PersistentNotificationItem[];
+    unreadCount: number;
+    openApplication: ApplicationInfo | null;
+    openLeadForApplication: Lead | null;
+    onOpenApplicationDetail: (applicationId: string) => void;
+    onOpenStudentProfile: (leadId: string, targetTab?: StudentInfoTab, leadDocPath?: string) => void;
+    onRequestTransfer: (lead: Lead) => void;
+    onUpdateLead: (lead: Lead) => void;
+    onAddLogEntry: (studentId: string, logMessage: string) => void;
+    onAddNote: (studentId: string, subject: string, content: string) => void;
+    onUpdateApplication: (application: ApplicationInfo) => void;
+    onStatusUpdateWithNote: (studentId: string, newStatus: string, providerName: string, noteContent: string) => void;
+    showPopup: (message: string, meta?: { eventKey?: string; persist?: boolean }) => void;
+    onProfileUpdate: (newPhotoURL?: string, updates?: Partial<User>) => void;
+    onNavigateToDashboard: () => void;
+    onNavigateToApplications: () => void;
+    onLoginAgain: () => void;
+    onOpenRequestLeaveModal: () => void;
+    onOpenRequestOffsetModal: () => void;
+    onOpenRequestUseOffsetModal: () => void;
+    onBranchChangeRequestSubmit: (data: BranchChangeRequestFormData) => void | Promise<void>;
+    onMarkAllNotificationsRead: () => void;
+}

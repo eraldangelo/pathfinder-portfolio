@@ -1,0 +1,60 @@
+name: Bug Report
+description: Report a functional bug in Pathfinder.
+title: "[Bug] "
+labels:
+  - bug
+  - needs-triage
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Short description of the issue.
+      placeholder: What broke?
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Dashboard
+        - Leads
+        - Applications
+        - Timesheet
+        - Personnel
+        - Archive
+        - Auth/Login
+        - Notifications
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction Steps
+      description: Numbered steps from a clean state.
+      placeholder: |
+        1. Go to ...
+        2. Select ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Result
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Logs/Screenshots
+      description: Include console errors, server logs, screenshots, or video.
+

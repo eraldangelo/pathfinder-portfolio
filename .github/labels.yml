@@ -1,0 +1,30 @@
+- name: bug
+  color: d73a4a
+  description: Something is not working.
+- name: regression
+  color: b60205
+  description: Behavior regressed from a previously working state.
+- name: role-access
+  color: 1d76db
+  description: Role-based access or data-scope mismatch.
+- name: needs-triage
+  color: fbca04
+  description: Requires initial classification and assignment.
+- name: dependencies
+  color: 0366d6
+  description: Dependency update changes.
+- name: automated
+  color: bfd4f2
+  description: Bot-generated changes or automation updates.
+- name: ci
+  color: 5319e7
+  description: CI workflow/build related changes.
+- name: documentation
+  color: 0075ca
+  description: Documentation improvements and fixes.
+- name: security
+  color: b60205
+  description: Security issue or hardening work.
+- name: stale
+  color: cfd3d7
+  description: Marked stale due to inactivity.

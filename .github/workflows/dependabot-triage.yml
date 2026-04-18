@@ -1,0 +1,38 @@
+name: Dependabot Triage
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  triage:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@08eff52bf64351f401fb50d4972fa95b9f2c2d1b # v2.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply triage labels
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const labels = new Set(['dependencies', 'automated', 'needs-triage']);
+            const ecosystem = '${{ steps.metadata.outputs.package-ecosystem }}';
+            const updateType = '${{ steps.metadata.outputs.update-type }}';
+            if (ecosystem === 'github_actions') labels.add('ci');
+            if (updateType.startsWith('version-update:semver-major')) labels.add('regression');
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [...labels],
+            });

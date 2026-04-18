@@ -1,0 +1,20 @@
+export const countryAliasPairs: ReadonlyArray<readonly [string, string]> = [
+  ['united states', 'United States of America'],
+  ['us', 'United States of America'],
+  ['u s', 'United States of America'],
+  ['usa', 'United States of America'],
+  ['u s a', 'United States of America'],
+  ['uk', 'United Kingdom'],
+  ['u k', 'United Kingdom'],
+  ['great britain', 'United Kingdom'],
+  ['britain', 'United Kingdom'],
+  ['england', 'United Kingdom'],
+  ['korea', 'South Korea'],
+  ['south korea', 'South Korea'],
+  ['republic of korea', 'South Korea'],
+  ['korea south', 'South Korea'],
+  ['newzealand', 'New Zealand'],
+  ['new zealand', 'New Zealand'],
+  ['nz', 'New Zealand'],
+];
+

@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:00"
+      timezone: "Asia/Manila"
+    open-pull-requests-limit: 8
+    labels:
+      - dependencies
+      - automated
+    commit-message:
+      prefix: "deps"
+    groups:
+      next-stack:
+        patterns:
+          - "next"
+          - "react*"
+          - "@types/react*"
+      firebase-stack:
+        patterns:
+          - "firebase*"
+      lint-stack:
+        patterns:
+          - "eslint*"
+      test-stack:
+        patterns:
+          - "@playwright/test"
+          - "ts-prune"
+          - "tsx"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "03:30"
+      timezone: "Asia/Manila"
+    labels:
+      - dependencies
+      - ci
+      - automated
+    commit-message:
+      prefix: "ci"
+

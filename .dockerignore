@@ -1,0 +1,13 @@
+.git
+.next
+node_modules
+npm-debug.log
+yarn-error.log
+.env
+.env.*
+key.json
+docs
+functions
+scripts
+README.md
+*.md

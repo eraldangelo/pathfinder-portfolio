@@ -1,0 +1,49 @@
+name: Yearly Archive Rollover
+
+on:
+  schedule:
+    # 00:00 Asia/Manila on January 1st = 16:00 UTC on December 31st.
+    - cron: '0 16 31 12 *'
+  workflow_dispatch: {}
+
+jobs:
+  run-rollover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: yearly-archive-rollover-prod
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - name: Validate required secrets
+        env:
+          ARCHIVE_JOB_KEY: ${{ secrets['ARCHIVE_JOB_KEY'] }}
+        run: |
+          if [ -z "$ARCHIVE_JOB_KEY" ]; then
+            echo "Missing ARCHIVE_JOB_KEY secret."
+            exit 1
+          fi
+
+      - name: Trigger yearly rollover endpoint
+        env:
+          APP_BASE_URL: ${{ secrets['APP_BASE_URL'] }}
+          ARCHIVE_JOB_KEY: ${{ secrets['ARCHIVE_JOB_KEY'] }}
+        run: |
+          BASE_URL="${APP_BASE_URL:-https://your-app.example.com/}"
+          URL="${BASE_URL%/}/api/archive/yearly-rollover"
+          STATUS=$(curl -sS -o response.json -w "%{http_code}" \
+            --connect-timeout 10 \
+            --max-time 60 \
+            --retry 5 \
+            --retry-all-errors \
+            --retry-delay 3 \
+            --retry-max-time 120 \
+            -X POST "$URL" \
+            -H "Content-Type: application/json" \
+            -H "x-archive-job-key: $ARCHIVE_JOB_KEY")
+          cat response.json
+          if [ "$STATUS" -ne 200 ] && [ "$STATUS" -ne 409 ]; then
+            echo "Rollover request failed with status $STATUS"
+            exit 1
+          fi

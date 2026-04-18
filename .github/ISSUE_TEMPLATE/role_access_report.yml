@@ -1,0 +1,47 @@
+name: Role/Access Report
+description: Report role permission or data-scope mismatch.
+title: "[Role Access] "
+labels:
+  - role-access
+  - needs-triage
+body:
+  - type: dropdown
+    id: role
+    attributes:
+      label: Role
+      options:
+        - Developer
+        - Operations
+        - Branch Manager
+        - Education Consultant
+        - Administrative Staff
+        - Satellite Office Staff
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Access/Scope
+      description: What this role should be allowed to see/do.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Access/Scope
+      description: What happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: route
+    attributes:
+      label: Route/Feature
+      description: Route, module, and any filter context.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Include screenshot/video/logs and account branch context.
+

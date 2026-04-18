@@ -1,0 +1,12 @@
+* @your-github-username
+
+/src/app/api/ @your-github-username
+/src/components/dashboard/ @your-github-username
+/src/components/leads/ @your-github-username
+/src/components/app/ @your-github-username
+/scripts/ @your-github-username
+/docs/ @your-github-username
+/.github/workflows/ @your-github-username
+/src/config/legalNotice.ts @your-github-username
+/src/components/layout/components/MobileSidebarExpandedActions.tsx @your-github-username
+/scripts/check-legal-notice.cjs @your-github-username

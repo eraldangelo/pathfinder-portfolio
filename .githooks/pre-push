@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+if [ "$SKIP_VERIFY_HOOK" = "1" ]; then
+  echo "Skipping pre-push verify hook (SKIP_VERIFY_HOOK=1)."
+  exit 0
+fi
+
+echo "Running pre-push quality gate: npm run verify"
+npm run verify
+

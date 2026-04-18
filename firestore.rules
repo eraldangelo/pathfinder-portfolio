@@ -1,0 +1,911 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdminPhReadonlyAccount() {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && request.auth.token.email.matches('^\\s*[Aa][Dd][Mm][Ii][Nn]_[Pp][Hh]@[Ii][Kk][Oo][Kk][Oo][Ss]\\.[Cc][Oo][Mm]\\s*$');
+    }
+
+    function currentUserRole() {
+      return isSignedIn()
+        ? get(/databases/$(database)/documents/personnel/$(request.auth.uid)).data.role
+        : null;
+    }
+
+    function currentUserBranch() {
+      return isSignedIn()
+        ? get(/databases/$(database)/documents/personnel/$(request.auth.uid)).data.branch
+        : null;
+    }
+
+    function currentUserApprovalBranchKey() {
+      let profile = isSignedIn()
+        ? get(/databases/$(database)/documents/personnel/$(request.auth.uid)).data
+        : null;
+      return profile != null
+        && profile.keys().hasAny(['approvalBranchKey'])
+        && profile.approvalBranchKey is string
+          ? profile.approvalBranchKey
+          : null;
+    }
+
+    function isDeveloperRole() {
+      let role = currentUserRole();
+      return role != null
+        && (
+          role.matches('^\\s*[Dd][Ee][Vv][Ee][Ll][Oo][Pp][Ee][Rr]\\s*$')
+          || role.matches('^\\s*[Dd][Ee][Vv][Ee][Ll][Oo][Pp][Ee][Rr]\\s*\\([Aa][Ll][Ll]\\s+[Aa][Cc][Cc][Ee][Ss][Ss]\\)\\s*$')
+        );
+    }
+
+    function isOperationsRole() {
+      let role = currentUserRole();
+      return role != null && role.matches('^\\s*[Oo][Pp][Ee][Rr][Aa][Tt][Ii][Oo][Nn][Ss]\\s*$');
+    }
+
+    function isAdministrativeStaffRole() {
+      let role = currentUserRole();
+      return role != null && role.matches('^\\s*[Aa][Dd][Mm][Ii][Nn][Ii][Ss][Tt][Rr][Aa][Tt][Ii][Vv][Ee]\\s+[Ss][Tt][Aa][Ff][Ff]\\s*$');
+    }
+
+    function isSatelliteOfficeStaffRole() {
+      let role = currentUserRole();
+      return role != null && role.matches('^\\s*[Ss][Aa][Tt][Ee][Ll][Ll][Ii][Tt][Ee]\\s+[Oo][Ff][Ff][Ii][Cc][Ee]\\s+[Ss][Tt][Aa][Ff][Ff]\\s*$');
+    }
+
+    function isBranchManagerRole() {
+      let role = currentUserRole();
+      return role != null && role.matches('^\\s*[Bb][Rr][Aa][Nn][Cc][Hh]\\s+[Mm][Aa][Nn][Aa][Gg][Ee][Rr]\\s*$');
+    }
+
+    function isMarketingRole() {
+      let role = currentUserRole();
+      return role != null
+        && (
+          role.matches('^\\s*[Mm][Aa][Rr][Kk][Ee][Tt][Ii][Nn][Gg]\\s+[Ss][Tt][Aa][Ff][Ff]\\s*$')
+          || role.matches('^\\s*[Mm][Aa][Rr][Kk][Ee][Tt][Ii][Nn][Gg]\\s*$')
+        );
+    }
+
+    function isEducationConsultantRole() {
+      let role = currentUserRole();
+      return role != null
+        && (
+          role.matches('^\\s*[Ee][Dd][Uu][Cc][Aa][Tt][Ii][Oo][Nn]\\s+[Cc][Oo][Nn][Ss][Uu][Ll][Tt][Aa][Nn][Tt]\\s*$')
+          || role.matches('^\\s*[Ee][Dd][Uu][Cc][Aa][Tt][Ii][Oo][Nn]\\s+[Cc][Oo][Uu][Nn][Ss][Ee][Ll][Ll][Oo][Rr]\\s*$')
+          || role.matches('^\\s*[Ee][Dd][Uu][Cc][Aa][Tt][Ii][Oo][Nn]\\s+[Cc][Oo][Uu][Nn][Ss][Ee][Ll][Oo][Uu][Rr]\\s*$')
+        );
+    }
+
+    function isBranchManila(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Aa][Nn][Ii][Ll][Aa]\\s*$');
+    }
+
+    function isBranchCebu(branch) {
+      return branch != null && branch.matches('^\\s*[Cc][Ee][Bb][Uu]\\s*$');
+    }
+
+    function isBranchPampanga(branch) {
+      return branch != null && branch.matches('^\\s*[Pp][Aa][Mm][Pp][Aa][Nn][Gg][Aa]\\s*$');
+    }
+
+    function isBranchMakati(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Aa][Kk][Aa][Tt][Ii]\\s*$');
+    }
+
+    function isBranchMetroManila(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Ee][Tt][Rr][Oo]\\s+[Mm][Aa][Nn][Ii][Ll][Aa]\\s*$');
+    }
+
+    function isBranchManilaCity(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Aa][Nn][Ii][Ll][Aa]\\s+[Cc][Ii][Tt][Yy]\\s*$');
+    }
+
+    function isBranchMakatiCity(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Aa][Kk][Aa][Tt][Ii]\\s+[Cc][Ii][Tt][Yy]\\s*$');
+    }
+
+    function isBranchManilaBranch(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Aa][Nn][Ii][Ll][Aa]\\s+[Bb][Rr][Aa][Nn][Cc][Hh]\\s*$');
+    }
+
+    function isBranchDavaoCity(branch) {
+      return branch != null && branch.matches('^\\s*[Dd][Aa][Vv][Aa][Oo]\\s+[Cc][Ii][Tt][Yy]\\s*$');
+    }
+
+    function isBranchCebuCity(branch) {
+      return branch != null && branch.matches('^\\s*[Cc][Ee][Bb][Uu]\\s+[Cc][Ii][Tt][Yy]\\s*$');
+    }
+
+    function isBranchManilaLike(branch) {
+      return isBranchManila(branch)
+        || isBranchMakati(branch)
+        || isBranchMetroManila(branch)
+        || isBranchManilaCity(branch)
+        || isBranchMakatiCity(branch)
+        || isBranchManilaBranch(branch);
+    }
+
+    function isBranchDavaoLike(branch) {
+      return (branch != null && branch.matches('^\\s*[Dd][Aa][Vv][Aa][Oo]\\s*$'))
+        || isBranchDavaoCity(branch);
+    }
+
+    function isBranchCebuLike(branch) {
+      return isBranchCebu(branch) || isBranchCebuCity(branch);
+    }
+
+    function isBranchDavao(branch) {
+      return branch != null && branch.matches('^\\s*[Dd][Aa][Vv][Aa][Oo]\\s*$');
+    }
+
+    function isBranchMelbourne(branch) {
+      return branch != null && branch.matches('^\\s*[Mm][Ee][Ll][Bb][Oo][Uu][Rr][Nn][Ee]\\s*$');
+    }
+
+    function canViewAllTeamTimesheets() {
+      let branch = currentUserBranch();
+      return isDeveloperRole()
+        || isAdminPhReadonlyAccount()
+        || (isOperationsRole() && (isBranchDavao(branch) || isBranchMelbourne(branch)));
+    }
+
+    function canViewBranchTeamTimesheets() {
+      let branch = currentUserBranch();
+      return (isOperationsRole() && isBranchManila(branch))
+        || (isBranchManagerRole() && (isBranchCebu(branch) || isBranchPampanga(branch)));
+    }
+
+    function targetUserBranch(personnelId) {
+      return get(/databases/$(database)/documents/personnel/$(personnelId)).data.branch;
+    }
+
+    function canReadTeamMemberTimesheet(personnelId) {
+      let viewerBranch = currentUserBranch();
+      let targetBranch = targetUserBranch(personnelId);
+      return isSignedIn()
+        && (
+          request.auth.uid == personnelId
+          || canViewAllTeamTimesheets()
+          || (
+            canViewBranchTeamTimesheets()
+            && (
+              (isBranchManila(viewerBranch) && isBranchManila(targetBranch))
+              || (isBranchCebu(viewerBranch) && isBranchCebu(targetBranch))
+              || (isBranchPampanga(viewerBranch) && isBranchPampanga(targetBranch))
+            )
+          )
+        );
+    }
+
+    function isApproverRole() {
+      return !isAdminPhReadonlyAccount()
+        && (
+          isOperationsRole()
+          || isBranchManagerRole()
+          || isDeveloperRole()
+        );
+    }
+
+    function currentUserBranchKey() {
+      let approvalBranchKey = currentUserApprovalBranchKey();
+      let branch = currentUserBranch();
+      return isBranchManilaLike(approvalBranchKey)
+        ? 'manila'
+        : isBranchDavaoLike(approvalBranchKey)
+          ? 'davao'
+          : isBranchCebuLike(approvalBranchKey)
+            ? 'cebu'
+            : isBranchPampanga(approvalBranchKey)
+              ? 'pampanga'
+              : isBranchManilaLike(branch)
+                ? 'manila'
+                : isBranchDavaoLike(branch)
+                  ? 'davao'
+                  : isBranchCebuLike(branch)
+                    ? 'cebu'
+                    : isBranchPampanga(branch)
+                      ? 'pampanga'
+                      : '';
+    }
+
+    function isBranchChangeQueueTargetForCurrentApprover(targetBranchKey, targetRoles) {
+      let viewerBranchKey = currentUserBranchKey();
+      let hasOperationsTarget = targetRoles is list && targetRoles.hasAny(['operations']);
+      let hasBranchManagerTarget = targetRoles is list && targetRoles.hasAny(['branch manager']);
+      let hasDeveloperTarget = targetRoles is list && targetRoles.hasAny(['developer']);
+
+      return (
+        isDeveloperRole() && hasDeveloperTarget
+      )
+      || (
+        isOperationsRole()
+        && viewerBranchKey != ''
+        && targetBranchKey == viewerBranchKey
+        && hasOperationsTarget
+      )
+      || (
+        isBranchManagerRole()
+        && viewerBranchKey != ''
+        && targetBranchKey == viewerBranchKey
+        && hasBranchManagerTarget
+      );
+    }
+
+    function isBranchChangeQueueRequesterUpdate() {
+      return isSignedIn()
+        && request.auth.uid == resource.data.requesterId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'notificationStatus',
+          'notificationAttemptedAt',
+          'notificationSentAt',
+          'notificationError',
+          'approverSummary',
+          'updatedAt',
+        ]);
+    }
+
+    function isBranchChangeQueueApproverRole() {
+      return isDeveloperRole() || isOperationsRole() || isBranchManagerRole();
+    }
+
+    function hasAdminClaim() {
+      return request.auth != null && request.auth.token.get('admin', false) == true;
+    }
+
+    function canEditAdminScreening() {
+      return isDeveloperRole()
+        || isAdministrativeStaffRole()
+        || isSatelliteOfficeStaffRole()
+        || hasAdminClaim();
+    }
+
+    function isGlobalLeadWriterRole() {
+      return isDeveloperRole()
+        || isOperationsRole()
+        || hasAdminClaim();
+    }
+
+    function isBranchScopedLeadWriterRole() {
+      return isBranchManagerRole()
+        || isAdministrativeStaffRole()
+        || isSatelliteOfficeStaffRole();
+    }
+
+    function isAssignedLeadWriterRole() {
+      return isEducationConsultantRole();
+    }
+
+    function canWriteLeadDocuments() {
+      return isSignedIn()
+        && !isAdminPhReadonlyAccount()
+        && (
+          isGlobalLeadWriterRole()
+          || isBranchScopedLeadWriterRole()
+          || isAssignedLeadWriterRole()
+        );
+    }
+
+    function isValidNotificationCreatePayload() {
+      return request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 2000
+        && request.resource.data.read is bool;
+    }
+
+    function isSelfMutablePersonnelUpdate(personnelId) {
+      return isSignedIn()
+        && request.auth.uid == personnelId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name',
+          'firstName',
+          'lastName',
+          'preferredName',
+          'dob',
+          'personalEmail',
+          'personalMobileCountryCode',
+          'personalMobileNumber',
+          'businessMobileCountryCode',
+          'businessMobileNumber',
+          'photoURL',
+          'activityStatus',
+          'activityStatusUpdatedAt',
+        ]);
+    }
+
+    function assessmentSubmissionBranch(submissionId) {
+      return get(/databases/$(database)/documents/leads/$(submissionId)).data.referredStaffBranch;
+    }
+
+    function isAssignedCounsellor(submissionId) {
+      return isSignedIn()
+        && (
+          get(/databases/$(database)/documents/leads/$(submissionId)).data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(get(/databases/$(database)/documents/leads/$(submissionId)).data.assignedCounsellor)
+        );
+    }
+
+    function isAssignedCounsellorLead(leadId) {
+      return isSignedIn()
+        && (
+          get(/databases/$(database)/documents/leads/$(leadId)).data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(get(/databases/$(database)/documents/leads/$(leadId)).data.assignedCounsellor)
+        );
+    }
+
+    function assessmentSubmissionBranchFromResource() {
+      return resource.data.referredStaffBranch;
+    }
+
+    function isAssignedCounsellorFromResource() {
+      return isSignedIn()
+        && (
+          resource.data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(resource.data.assignedCounsellor)
+        );
+    }
+
+    function isAssignedCounsellorFromRequest() {
+      return isSignedIn()
+        && (
+          request.resource.data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(request.resource.data.assignedCounsellor)
+        );
+    }
+
+    function isLeadBranchWritable(branch) {
+      return branch != null
+        && currentUserBranch() != null
+        && branch == currentUserBranch();
+    }
+
+    function canCreateLeadDocument() {
+      return canWriteLeadDocuments()
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && isLeadBranchWritable(request.resource.data.referredStaffBranch))
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorFromRequest())
+        );
+    }
+
+    function canUpdateLeadDocument() {
+      return canWriteLeadDocuments()
+        && (
+          isGlobalLeadWriterRole()
+          || (
+            isBranchScopedLeadWriterRole()
+            && isLeadBranchWritable(resource.data.referredStaffBranch)
+            && isLeadBranchWritable(request.resource.data.referredStaffBranch)
+          )
+          || (
+            isAssignedLeadWriterRole()
+            && isAssignedCounsellorFromResource()
+            && isAssignedCounsellorFromRequest()
+          )
+        );
+    }
+
+    function canDeleteLeadDocument() {
+      return canWriteLeadDocuments()
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && isLeadBranchWritable(resource.data.referredStaffBranch))
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorFromResource())
+        );
+    }
+
+    function canWriteLeadChildren(leadId) {
+      return canWriteLeadDocuments()
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && assessmentSubmissionBranch(leadId) == currentUserBranch())
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorLead(leadId))
+        );
+    }
+
+    function isGlobalLeadReaderRole() {
+      return isDeveloperRole()
+        || isOperationsRole()
+        || isMarketingRole()
+        || hasAdminClaim();
+    }
+
+    function isBranchScopedLeadReaderRole() {
+      return isBranchManagerRole()
+        || isAdministrativeStaffRole()
+        || isSatelliteOfficeStaffRole()
+        || isEducationConsultantRole();
+    }
+
+    function isAuthorizedStaffUser() {
+      return isSignedIn()
+        && (
+          isGlobalLeadReaderRole()
+          || isBranchScopedLeadReaderRole()
+          || isAdminPhReadonlyAccount()
+        );
+    }
+
+    function canReadAssessmentSubmissionDoc() {
+      return isGlobalLeadReaderRole()
+        || isAdminPhReadonlyAccount()
+        || (
+          isBranchScopedLeadReaderRole()
+          && (
+            isAssignedCounsellorFromResource()
+            || assessmentSubmissionBranchFromResource() == currentUserBranch()
+          )
+        );
+    }
+
+    function canReadAssessmentSubmission(submissionId) {
+      return isGlobalLeadReaderRole()
+        || isAdminPhReadonlyAccount()
+        || (
+          isBranchScopedLeadReaderRole()
+          && (
+            isAssignedCounsellor(submissionId)
+            || assessmentSubmissionBranch(submissionId) == currentUserBranch()
+          )
+        );
+    }
+
+    function canEditConsultation(submissionId) {
+      return isDeveloperRole()
+        || ((isEducationConsultantRole() || isBranchManagerRole()) && isAssignedCounsellor(submissionId));
+    }
+
+    function canEditConsultationLead(leadId) {
+      return isDeveloperRole()
+        || ((isEducationConsultantRole() || isBranchManagerRole()) && isAssignedCounsellorLead(leadId));
+    }
+
+    function currentUserName() {
+      return isSignedIn()
+        ? get(/databases/$(database)/documents/personnel/$(request.auth.uid)).data.name
+        : null;
+    }
+
+    function isAssignedByCounsellorName(value) {
+      return isSignedIn()
+        && currentUserName() != null
+        && value != null
+        && value == currentUserName();
+    }
+
+    function archivedLeadExists(year, leadId) {
+      return exists(/databases/$(database)/documents/archives/$(year)/leads/$(leadId));
+    }
+
+    function archivedLeadDoc(year, leadId) {
+      return archivedLeadExists(year, leadId)
+        ? get(/databases/$(database)/documents/archives/$(year)/leads/$(leadId)).data
+        : null;
+    }
+
+    function isAssignedCounsellorArchiveLead(year, leadId) {
+      let archived = archivedLeadDoc(year, leadId);
+      return isSignedIn()
+        && archived != null
+        && (
+          archived.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(archived.assignedCounsellor)
+        );
+    }
+
+    function canCreateArchiveLeadDocument() {
+      return canWriteLeadDocuments()
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && isLeadBranchWritable(request.resource.data.referredStaffBranch))
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorFromRequest())
+        );
+    }
+
+    function canUpdateArchiveLeadDocument(year, leadId) {
+      let archived = archivedLeadDoc(year, leadId);
+      return canWriteLeadDocuments()
+        && archived != null
+        && (
+          isGlobalLeadWriterRole()
+          || (
+            isBranchScopedLeadWriterRole()
+            && isLeadBranchWritable(archived.referredStaffBranch)
+            && isLeadBranchWritable(request.resource.data.referredStaffBranch)
+          )
+          || (
+            isAssignedLeadWriterRole()
+            && isAssignedCounsellorArchiveLead(year, leadId)
+            && isAssignedCounsellorFromRequest()
+          )
+        );
+    }
+
+    function canDeleteArchiveLeadDocument(year, leadId) {
+      let archived = archivedLeadDoc(year, leadId);
+      return canWriteLeadDocuments()
+        && archived != null
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && isLeadBranchWritable(archived.referredStaffBranch))
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorArchiveLead(year, leadId))
+        );
+    }
+
+    function canWriteArchiveLeadChildren(year, leadId) {
+      let archived = archivedLeadDoc(year, leadId);
+      return canWriteLeadDocuments()
+        && archived != null
+        && (
+          isGlobalLeadWriterRole()
+          || (isBranchScopedLeadWriterRole() && isLeadBranchWritable(archived.referredStaffBranch))
+          || (isAssignedLeadWriterRole() && isAssignedCounsellorArchiveLead(year, leadId))
+        );
+    }
+
+    function canEditConsultationArchiveLead(year, leadId) {
+      return isDeveloperRole()
+        || ((isEducationConsultantRole() || isBranchManagerRole()) && isAssignedCounsellorArchiveLead(year, leadId));
+    }
+
+    function isApplicationAssignedToCurrentUserFromResource() {
+      return isSignedIn()
+        && (
+          resource.data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(resource.data.assignedCounsellor)
+        );
+    }
+
+    function isApplicationAssignedToCurrentUserFromRequest() {
+      return isSignedIn()
+        && (
+          request.resource.data.assignedCounsellorUid == request.auth.uid
+          || isAssignedByCounsellorName(request.resource.data.assignedCounsellor)
+        );
+    }
+
+    function isArchivedLead(leadId) {
+      return exists(/databases/$(database)/documents/leads/$(leadId))
+        && get(/databases/$(database)/documents/leads/$(leadId)).data.isArchived == true;
+    }
+
+    function canCreateArchivedLeadApplicationFromRequest(leadId) {
+      return isSignedIn()
+        && isArchivedLead(leadId)
+        && request.resource.data.studentId == leadId
+        && isApplicationAssignedToCurrentUserFromRequest();
+    }
+
+    function canWriteArchivedLeadApplicationStatus(leadId) {
+      return isSignedIn()
+        && request.resource.data.source == 'application'
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.applicationId is string
+        && (
+          getAfter(/databases/$(database)/documents/leads/$(leadId)/applications/$(request.resource.data.applicationId)).data.createdByUid == request.auth.uid
+          || get(/databases/$(database)/documents/leads/$(leadId)/applications/$(request.resource.data.applicationId)).data.createdByUid == request.auth.uid
+        );
+    }
+
+    function canWriteArchivedYearLeadApplicationStatus(year, leadId) {
+      return isSignedIn()
+        && request.resource.data.source == 'application'
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.applicationId is string
+        && (
+          getAfter(/databases/$(database)/documents/archives/$(year)/leads/$(leadId)/applications/$(request.resource.data.applicationId)).data.createdByUid == request.auth.uid
+          || get(/databases/$(database)/documents/archives/$(year)/leads/$(leadId)/applications/$(request.resource.data.applicationId)).data.createdByUid == request.auth.uid
+        );
+    }
+
+    function canCreateApplication(leadId) {
+      return isDeveloperRole()
+        || hasAdminClaim()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && (
+            isAssignedCounsellorLead(leadId)
+            || canCreateArchivedLeadApplicationFromRequest(leadId)
+          )
+        );
+    }
+
+    function canUpdateApplication(leadId) {
+      return isDeveloperRole()
+        || hasAdminClaim()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && (
+            isAssignedCounsellorLead(leadId)
+            || isApplicationCreatedByCurrentUserFromResource()
+          )
+        );
+    }
+
+    function canCreateArchiveApplication(year, leadId) {
+      return isDeveloperRole()
+        || hasAdminClaim()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && isAssignedCounsellorArchiveLead(year, leadId)
+          && isApplicationAssignedToCurrentUserFromRequest()
+        );
+    }
+
+    function canUpdateArchiveApplication(year, leadId) {
+      return isDeveloperRole()
+        || hasAdminClaim()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && (
+            isAssignedCounsellorArchiveLead(year, leadId)
+            || isApplicationCreatedByCurrentUserFromResource()
+          )
+        );
+    }
+
+    function canDeleteApplication() {
+      return isDeveloperRole() || hasAdminClaim();
+    }
+
+    function canWriteApplicationStatus(leadId) {
+      return isDeveloperRole()
+        || hasAdminClaim()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && (
+            isAssignedCounsellorLead(leadId)
+            || canWriteArchivedLeadApplicationStatus(leadId)
+          )
+        );
+    }
+
+    function isApplicationCreatedByCurrentUserFromResource() {
+      return isSignedIn()
+        && resource.data.createdByUid == request.auth.uid;
+    }
+
+    function canViewApplication() {
+      return isDeveloperRole()
+        || isOperationsRole()
+        || isBranchManagerRole()
+        || isMarketingRole()
+        || isAdministrativeStaffRole()
+        || (isEducationConsultantRole() && isApplicationCreatedByCurrentUserFromResource())
+        || hasAdminClaim();
+    }
+
+    function isLeaveBalanceUpdateOnly() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['leaveBalance', 'leaveUsed', 'offsetBalance', 'offsetUsed']);
+    }
+    // Bug reports are readable by signed-in staff and writable by signed-in users.
+    match /reports/{reportId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if isSignedIn();
+      allow update, delete: if hasAdminClaim();
+    }
+
+    // Read access for connectivity heartbeat listener used by the app.
+    match /_connectivity-check/{docId} {
+      allow read: if isAuthorizedStaffUser();
+      allow write: if false;
+    }
+
+    // Public read for fees collection, writes only for authenticated admins
+    match /fees/{feeId} {
+      allow read: if true; // public read access for fee lookups
+      allow create, update, delete: if hasAdminClaim();
+    }
+
+    // Education provider directory is readable by authenticated users only.
+    match /educationProviders/{providerId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if false;
+    }
+
+    // Personnel profiles are created by trusted backend/admin paths.
+    match /personnel/{personnelId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if false;
+      allow update: if isSelfMutablePersonnelUpdate(personnelId)
+        || (isApproverRole() && isLeaveBalanceUpdateOnly());
+    }
+    match /personnel/{personnelId}/notifications/{notificationId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == personnelId;
+      allow create: if isSignedIn()
+        && !isAdminPhReadonlyAccount()
+        && request.auth.uid == personnelId
+        && isValidNotificationCreatePayload();
+    }
+    match /personnel/{personnelId}/timesheets/{timesheetId} {
+      allow get: if canReadTeamMemberTimesheet(personnelId);
+      allow list: if isSignedIn() && (request.auth.uid == personnelId || canViewAllTeamTimesheets());
+      allow create, update, delete: if request.auth != null && request.auth.uid == personnelId;
+    }
+    // Safety net for collectionGroup(timesheets) queries.
+    match /{path=**}/timesheets/{timesheetId} {
+      allow list: if isSignedIn() && canViewAllTeamTimesheets();
+    }
+    match /personnel/{personnelId}/leaveRequests/{requestId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if request.auth != null
+        && request.auth.uid == personnelId
+        && request.resource.data.dayCount is int
+        && request.resource.data.dayCount > 0
+        && request.resource.data.dayCount <= get(/databases/$(database)/documents/personnel/$(personnelId)).data.leaveBalance;
+      allow delete: if request.auth != null && request.auth.uid == personnelId;
+      allow update: if request.auth != null && isApproverRole();
+    }
+    match /personnel/{personnelId}/offsetRequests/{requestId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if request.auth != null
+        && request.auth.uid == personnelId
+        && request.resource.data.hours is number
+        && request.resource.data.hours > 0
+        && (
+          !request.resource.data.keys().hasAny(['mode'])
+          || request.resource.data.mode == 'add'
+          || (request.resource.data.mode == 'use'
+            && request.resource.data.hours is int
+            && request.resource.data.hours >= 1
+            && request.resource.data.hours <= 7
+            && request.resource.data.hours <= get(/databases/$(database)/documents/personnel/$(personnelId)).data.offsetBalance
+          )
+        );
+      allow delete: if request.auth != null && request.auth.uid == personnelId;
+      allow update: if request.auth != null && isApproverRole();
+    }
+    match /personnel/{personnelId}/branchChangeRequests/{requestId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if request.auth != null
+        && request.auth.uid == personnelId
+        && request.resource.data.status == 'pending';
+      allow delete: if request.auth != null && request.auth.uid == personnelId;
+      allow update: if request.auth != null && isApproverRole();
+    }
+
+    match /branchChangeRequestQueue/{requestId} {
+      allow create: if isSignedIn()
+        && request.resource.data.requesterId == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if isBranchChangeQueueRequesterUpdate();
+      allow get: if isSignedIn()
+        && isBranchChangeQueueTargetForCurrentApprover(resource.data.targetBranchKey, resource.data.targetRoles);
+      allow list: if isSignedIn() && isBranchChangeQueueApproverRole();
+      allow delete: if false;
+    }
+    // Safety net for collectionGroup(leaveRequests) queries in case there are legacy paths.
+    match /{path=**}/leaveRequests/{requestId} {
+      allow read: if isAuthorizedStaffUser();
+    }
+    // Safety net for collectionGroup(offsetRequests) queries in case there are legacy paths.
+    match /{path=**}/offsetRequests/{requestId} {
+      allow read: if isAuthorizedStaffUser();
+    }
+
+    // Authenticated access for app data
+    match /leads/{leadId} {
+      allow read: if canReadAssessmentSubmissionDoc();
+      allow create: if canCreateLeadDocument();
+      allow update: if canUpdateLeadDocument();
+      allow delete: if canDeleteLeadDocument();
+    }
+
+    // Safety net for collectionGroup(leads) archive queries.
+    match /{path=**}/leads/{leadId} {
+      allow read: if canReadAssessmentSubmissionDoc();
+    }
+
+    match /leads/{leadId}/logs/{logId} {
+      allow read: if canReadAssessmentSubmission(leadId);
+      allow create, update, delete: if canWriteLeadChildren(leadId);
+    }
+
+    match /leads/{leadId}/notes/{noteId} {
+      allow read: if canReadAssessmentSubmission(leadId);
+      allow create: if canWriteLeadChildren(leadId);
+      allow update, delete: if canWriteLeadChildren(leadId);
+    }
+
+    match /leads/{leadId}/status/{statusId} {
+      allow read: if canReadAssessmentSubmission(leadId);
+      allow create: if request.auth != null
+        && request.resource.data.source is string
+        && (
+          (request.resource.data.source == 'admin' && canEditAdminScreening())
+          || (request.resource.data.source == 'consultation' && canEditConsultationLead(leadId))
+          || (request.resource.data.source == 'application' && canWriteApplicationStatus(leadId))
+        );
+      allow update, delete: if false;
+    }
+
+    // Applications live under leads/{leadId}/applications/{applicationId}.
+    // Keep root applications collection locked to prevent accidental writes.
+    match /applications/{applicationId} {
+      allow read, write: if false;
+    }
+
+    match /leads/{leadId}/applications/{applicationId} {
+      allow read: if canViewApplication()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && isAssignedCounsellorLead(leadId)
+        );
+      allow create: if canCreateApplication(leadId);
+      allow update: if canUpdateApplication(leadId);
+      allow delete: if canDeleteApplication();
+    }
+
+    // Safety net for collectionGroup(applications) queries.
+    match /{path=**}/applications/{applicationId} {
+      allow read: if canViewApplication();
+    }
+
+    match /archives/{year} {
+      allow read: if isAuthorizedStaffUser();
+      allow write: if false;
+    }
+
+    match /archives/{year}/leads/{leadId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if canCreateArchiveLeadDocument();
+      allow update: if canUpdateArchiveLeadDocument(year, leadId);
+      allow delete: if canDeleteArchiveLeadDocument(year, leadId);
+    }
+
+    match /archives/{year}/leads/{leadId}/logs/{logId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create, update, delete: if canWriteArchiveLeadChildren(year, leadId);
+    }
+
+    match /archives/{year}/leads/{leadId}/notes/{noteId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if canWriteArchiveLeadChildren(year, leadId);
+      allow update, delete: if canWriteArchiveLeadChildren(year, leadId);
+    }
+
+    match /archives/{year}/leads/{leadId}/status/{statusId} {
+      allow read: if isAuthorizedStaffUser();
+      allow create: if request.auth != null
+        && request.resource.data.source is string
+        && (
+          (request.resource.data.source == 'admin' && canEditAdminScreening())
+          || (request.resource.data.source == 'consultation' && canEditConsultationArchiveLead(year, leadId))
+          || (request.resource.data.source == 'application' && canWriteArchivedYearLeadApplicationStatus(year, leadId))
+        );
+      allow update, delete: if false;
+    }
+
+    // Safety net for collectionGroup(status) queries (Archive "Archived On" lookup).
+    match /{path=**}/status/{statusId} {
+      allow read: if isAuthorizedStaffUser();
+    }
+
+    match /archives/{year}/leads/{leadId}/applications/{applicationId} {
+      allow read: if canViewApplication()
+        || (
+          (isEducationConsultantRole() || isBranchManagerRole())
+          && isAssignedCounsellorArchiveLead(year, leadId)
+        );
+      allow create: if canCreateArchiveApplication(year, leadId);
+      allow update: if canUpdateArchiveApplication(year, leadId);
+      allow delete: if canDeleteApplication();
+    }
+
+    match /archives/{year}/leads/{leadId}/{childPath=**} {
+      allow read: if isAuthorizedStaffUser();
+      allow write: if false;
+    }
+
+    // Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

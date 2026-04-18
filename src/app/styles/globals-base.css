@@ -1,0 +1,108 @@
+﻿:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --text-shadow-color: rgba(255, 255, 255, 0.8);
+  --text-shadow-offset: 0 1px 1px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#__next {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+html {
+  color-scheme: light;
+  background-color: #f0f8ff;
+  background-image: var(--app-bg-light-image);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #000000;
+  background-image: var(--app-bg-dark-image);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  --text-shadow-color: rgba(0, 0, 0, 0.5);
+  --text-shadow-offset: 0 1px 3px;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-view-transition {
+  animation: app-view-enter 240ms ease-out;
+  will-change: opacity, transform;
+}
+
+@keyframes app-view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#__next {
+  min-height: 100vh;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* OpenLayers manages canvas dimensions internally. A global max-width rule
+   causes tile/heat layers to desync at browser zoom levels (e.g. 125%). */
+.ol-viewport canvas,
+.ol-layer canvas {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.text-floating {
+  text-shadow: var(--text-shadow-offset) var(--text-shadow-color);
+}
+
+.hotspots-map-overlay {
+  filter: saturate(0.6) brightness(1.05);
+}
+
+.hotspots-map-labels {
+  filter: none;
+}
